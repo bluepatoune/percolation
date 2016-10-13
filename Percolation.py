@@ -13,7 +13,7 @@ PIERRE = 0
 def percolation(n, p, T, i):
     """ Indique s'il y a percolation ou pas """
     P = matrice(n, p, i)
-    E = P.copy()        #On a le droit ?
+    E = P.copy()        #On a le droit ? -Oui oui.
     E = pluie(P, E)
     for t in range(T):
         pores_vides2 = []
@@ -79,12 +79,6 @@ def infiltration(E,pores_vides):
 #L'histoire de correspondance 0 1 2 avec VIDE EAU machin truc est à expliciter (un EAU = 2, VIDE = 0 en début de code est une piste envisageable)
 
 #Aérez le code : espaces entres les assignements (=, +=...), les items (,), et les comparateurs (!=, ==...)
-
-#La dernière fonction : à éviter. Utilisez :
-#   new = list(old)     -> rapide
-#   new = old.copy()    -> générique
-#   new = old.deepcopy()-> fera des copies des items internes au lieu de les linker
-#selon ce que vous voulez faire, mais pitié pas de [:] même planqué dans une fonction
 
 #Utilisez xrange() au lieu de range() si la liste est statique. Ça passe un itérateur à la structure for au lieu de passer une liste, c'est bien bien bien plus efficace.
 
