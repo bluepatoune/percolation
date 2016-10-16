@@ -23,14 +23,12 @@ def percolation(n, p, T, i): # TODO: On devrait passer à percolation() uniqueme
     pyplot.matshow([[-1, 0, 1, 2]], 1, cmap=cmap, norm=norm)
     pyplot.pause(1)
 
-    P = matrice(n, p, i) # TODO: Générer la matrice ailleurs !
-    E = list(P) # NOTE: C'est mieux copy() sous Python 3 et list() sous Pyhon 2.
+    E = matrice(n, p, i) # TODO: Générer la matrice ailleurs !
     E = pluie(E)
     for t in range(T):
         pyplot.matshow(E, 1, cmap=cmap, norm=norm) # TODO: Séparer la logique de display de la logique de génération (threads ?)
-        pyplot.pause(.0000001)
+        pyplot.pause(.0001)
         pores_vides2 = []
-        print 'arg'
         for x in range(len(E)):             # Lignes
             for y in range(1, len(E[0])):   # Colonnes
                 if E[x][y] == EAU:
@@ -40,7 +38,7 @@ def percolation(n, p, T, i): # TODO: On devrait passer à percolation() uniqueme
         if pores_vides2 == []: # Si aucune case n'a de voisines vides
             return resultat(E)
 
-def resultat(matrice): # NOTE: Inutile de passer n et p... Je l'ai réécrite différemment, mais je n'ai pas compris la logique de la fonction. TODO: Documenter.
+def resultat(matrice):
     for coef in matrice[len(matrice)-1]:
         if coef == EAU:
             return True
@@ -55,7 +53,7 @@ def pluie(matrice): # J'ai recodé la fonction, du coup il faut adapter le code 
 
 def regard(matrice, x, y): # NOTE: Idem. Noveau code, donc à utiliser différement.
     """Renvoie la liste des coordonnées des pores vides autour d'une case d'eau.""" # TODO: Et si c'est pas une case d'eau ?
-    pores_vides=[]
+    pores_vides = []
     for i in [-1, 0, 1]:
         for j in [-1, 0, 1]:
             if (i == 0 or j == 0) and matrice[x+i][y+j] == VIDE:
@@ -69,7 +67,10 @@ def infiltration(matrice, pores_vides):
     return matrice
 
 if __name__ == '__main__':
-    percolation(2000, 3000, 50000, .65)
+    data = -1
+    while data != None:
+        data = input("Entrez 4 args ")
+        percolation(data[0], data[1], data[2], data[3])
 
 
 
