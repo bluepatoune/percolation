@@ -20,7 +20,7 @@ def percolation(n, p, T, i): # TODO: On devrait passer à percolation() uniqueme
     cmap = colors.ListedColormap(couleurs) # TODO: Relève du display, à metttre ailleurs.
     norm = colors.BoundaryNorm(valeurs + [max(valeurs)+1], cmap.N)
 
-    pyplot.matshow([[-1, 0, 1, 2]], 1, cmap=cmap, norm=norm)
+    pyplot.matshow([valeurs], 1, cmap=cmap, norm=norm)
     pyplot.pause(1)
 
     E = matrice(n, p, i) # TODO: Générer la matrice ailleurs !
