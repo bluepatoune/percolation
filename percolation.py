@@ -5,7 +5,6 @@
 
 from matplotlib import pyplot # NOTE: Le 'as' est inutile, pyplot n'est utilisé qu'une fois...
 from matplotlib import colors
-from randomisation import matrice
 
 EAU = 2
 VIDE = 1
@@ -15,7 +14,12 @@ NEANT = -1
 couleurs = ['black', 'grey' , 'white', 'blue']
 valeurs  = [ NEANT ,  PIERRE,  VIDE  ,  EAU  ]
 
-def percolation(n, p, T, i): # TODO: On devrait passer à percolation() uniquement un objet matrice à la place de n, p... qui devraient être des propriétés de l'objet matrice
+def modelisation(n, p, i):
+    E = matrice(n, p, i)
+    E = pluie(E)
+    return percolation(E)
+
+def percolation(matrice): # TODO: On devrait passer à percolation() uniquement un objet matrice à la place de n, p... qui devraient être des propriétés de l'objet matrice
     """ Indique s'il y a percolation ou pas """
     cmap = colors.ListedColormap(couleurs) # TODO: Relève du display, à metttre ailleurs.
     norm = colors.BoundaryNorm(valeurs + [max(valeurs)+1], cmap.N)
@@ -23,23 +27,22 @@ def percolation(n, p, T, i): # TODO: On devrait passer à percolation() uniqueme
     pyplot.matshow([valeurs], 1, cmap=cmap, norm=norm)
     pyplot.pause(1)
 
-    E = matrice(n, p, i) # TODO: Générer la matrice ailleurs !
-    E = pluie(E)
+   
     for t in range(T):
-        pyplot.matshow(E, 1, cmap=cmap, norm=norm) # TODO: Séparer la logique de display de la logique de génération (threads ?)
+        pyplot.matshow(matrice, 1, cmap=cmap, norm=norm) # TODO: Séparer la logique de display de la logique de génération (threads ?)
         pyplot.pause(.0001)
         pores_vides2 = []
-        for x in range(len(E)):             # Lignes
-            for y in range(1, len(E[0])):   # Colonnes
-                if E[x][y] == EAU:
-                    pores_vides = regard(E, x, y)
-                    pores_vides2 += regard(E, x, y)
-                    E = infiltration(E, pores_vides)
+        for x in range(len(matrice)):             # Lignes
+            for y in range(1, len(matrice[0])):   # Colonnes
+                if matrice[x][y] == EAU:
+                    pores_vides = regard(matrice, x, y)
+                    pores_vides2 += regard(matrice, x, y)
+                    matrice = infiltration(matrice, pores_vides)
         if pores_vides2 == []: # Si aucune case n'a de voisines vides
-            return resultat(E)
+            return resultat(matrice)
 
 def resultat(matrice):
-    for coef in matrice[len(matrice)-1]:
+    for coef in matrice[len(matrice)-2]: # on parcoure l'avant dernière ligne de la matrice 
         if coef == EAU:
             return True
     return False
