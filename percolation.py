@@ -3,9 +3,9 @@
 
 """Percolation.py: Un module python pour effecter des percolations matricielles."""
 
-from matplotlib import pyplot 
-
-from matplotlib import colors
+from matplotlib    import pyplot 
+from matplotlib    import colors
+from randomisation import matrice
 
 EAU = 2
 VIDE = 1
@@ -13,12 +13,12 @@ ROCHE = 0
 NEANT = -1
 
 couleurs = ['black', 'grey' , 'white', 'blue']
-valeurs  = [ NEANT ,  PIERRE,  VIDE  ,  EAU  ]
+valeurs  = [ NEANT ,  ROCHE ,  VIDE  ,  EAU  ]
 
 def modelisation(n, p, indice=0.5):
-    E = matrice(n, p, indice)
-    E = pluie(E)
-    return percolation(E)
+    mat = matrice(n, p, indice)
+    mat = pluie(mat)
+    return percolation(mat)
 
 def percolation(matrice): 
     """ Indique s'il y a percolation ou pas """
@@ -68,11 +68,11 @@ def infiltration(matrice, pores_vides):
         matrice[x][y] = EAU
     return matrice
 
-"""if __name__ == '__main__':
-    data = -1
-    while data != None:
-        data = input("Entrez 4 args ")
-        percolation(data[0], data[1], data[2], data[3])"""
+#if __name__ == '__main__':
+#    data = -1
+#    while data != None:
+#        data = input("Entrez 4 args ")
+#        percolation(data[0], data[1], data[2], data[3])
 
 
 
