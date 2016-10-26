@@ -5,7 +5,7 @@
 
 from matplotlib    import pyplot 
 from matplotlib    import colors
-from randomisation import matrice
+#from randomisation import matrice
 
 EAU = 2
 VIDE = 1
