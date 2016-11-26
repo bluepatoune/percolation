@@ -26,7 +26,7 @@ def pores(matrice, indice=.5):
     return matrice
 
 def bords(matrice):
-    """On borde la matrice de -1, sur trois côtés."""
+    """On borde la matrice de -1, sur trois côtés.""" # TODO : Remplacer -1 par néant
     for ligne in matrice:
         ligne.insert(0, -1)
         ligne.append(-1)
