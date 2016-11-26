@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Percolation.py: Un module python pour effecter des percolations matricielles."""
+"""Percolation.py: Un module python pour effectuer des percolations matricielles."""
 
 from matplotlib    import pyplot 
 from matplotlib    import colors
@@ -13,8 +13,8 @@ VIDE = 1
 ROCHE = 0
 NEANT = -1
 
-couleurs = ['black', 'grey' , 'white', 'blue']
-valeurs  = [ NEANT ,  ROCHE ,  VIDE  ,  EAU  ]
+couleurs = ['black', 'grey' , 'white', 'blue', 'cyan']
+valeurs  = [ NEANT ,  ROCHE ,  VIDE  ,  EAU  ,  EAU_MOUVANTE]
 
 def modelisation(n, p, indice=0.5):
     mat = matrice(n, p, indice)
@@ -71,7 +71,7 @@ def regard(matrice, x, y):
     
 def initialisation_eau_mouvante(matrice):
     eau_mouvante = []
-    for i in range(len(matrice[0])):
+    for i in range(len(matrice[0])): # TODO : À recoder avec un truc type : "for i, coef in enumerate(matrice[0]): ..."
         if matrice[0][i] == EAU_MOUVANTE:
             eau_mouvante.append((0,i))
     return eau_mouvante
