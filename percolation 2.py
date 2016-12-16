@@ -5,8 +5,7 @@
 
 from matplotlib    import pyplot
 from matplotlib    import colors
-
-#from randomisation import matrice
+from random import random
 
 EAU_MOUVANTE = 3
 EAU = 2
@@ -22,7 +21,7 @@ def modelisation(n, p, indice=0.5):
     mat = pluie(mat)
     return percolation(mat)
 
- # changer nom matrice
+ #TODO:  changer nom matrice
 def percolation(matrice):  # methode 2
     """ Indique s'il y a percolation ou pas """
 
@@ -40,7 +39,6 @@ def percolation(matrice):  # methode 2
         eau_mouvante = propagation(matrice,eau_mouvante)
     return resultat(matrice)
 
-
 def propagation(matrice, eau_mouvante):
      pores_vides = []
      pores_vides_locale = []
@@ -51,22 +49,6 @@ def propagation(matrice, eau_mouvante):
         pores_vides += pores_vides_locale
      eau_mouvante = pores_vides[:]
      return eau_mouvante
-
-def percolation_critique(n, p, N, P):
-    proba = []
-    indice = []
-    for d in range(N+1):
-        indice += [d/N]
-    for i in indice:
-        S = 0
-        for e in range(P):
-            if modelisation(n, p, i):
-                S += 1
-        proba += [S/P]
-    pyplot.plot(indice, proba)
-    return indice, proba
-# EN FONCTION RAPPORT N/P
-
 
 def resultat(matrice):
     for coef in matrice[len(matrice)-2]: # on parcourt l'avant dernière ligne de la matrice
@@ -105,8 +87,7 @@ def infiltration(matrice, pores_vides):
         matrice[x][y] = EAU_MOUVANTE
     return matrice
 
-from random import random
-
+#randomisation de la matrice 
 def matrice(n, p, indice=.5):
     """Création d'une matrice modélisant une roche poreuse aléatoire."""
     matrice = zero(n, p)
@@ -137,24 +118,3 @@ def bords(matrice):
     ligne_bas = [NEANT] * len(matrice[0])
     matrice.append(ligne_bas)
     return matrice
-
-
-#if __name__ == '__main__':
-#    data = -1
-#    while data != None:
-#        data = input("Entrez 4 args ")
-#        percolation(data[0], data[1], data[2], data[3])
-
-
-
-#  ==[ COMMENTAIRES ]==
-
-#Vous devez définir clairement vos variables par leur nom
-
-#Ne jamais prendre de lettre majuscule en nom de variable.
-
-#Utilisez xrange() au lieu de range() si la liste est statique. Ça passe un itérateur à la structure for au lieu de passer une liste, c'est bien bien bien plus efficace.
-
-#Ne mélangez pas les fonctions et le display. Tout ce qui doit tourner de manière effective au lancement du script doit être dans "if __name__ == '__main__':", le reste c'est des fonctions. Vous pouvez ainsi concevoir et réutiliser votre code comme un module.
-
-
