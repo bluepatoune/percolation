@@ -6,8 +6,7 @@
 
 from matplotlib    import pyplot
 from matplotlib    import colors
-
-#from randomisation import matrice
+from random        import random
 
 EAU_MOUVANTE = 3
 EAU = 2
@@ -53,21 +52,6 @@ def propagation(espace, eau_mouvante):
      eau_mouvante = pores_vides[:]
      return eau_mouvante
 
-def percolation_critique(n, p, N, P):
-    proba = []
-    indice = []
-    for d in range(N+1):
-        indice += [d/N]
-    for i in indice:
-        S = 0
-        for e in range(P):
-            if modelisation(n, p, i):
-                S += 1
-        proba += [S/P]
-    pyplot.plot(indice, proba)
-    return indice, proba
-# EN FONCTION RAPPORT N/P
-
 
 def resultat(espace):
     for matrice in espace:
@@ -92,10 +76,6 @@ def regard(espace, x, y, z):
             if (i == 0 or j == 0) and matrice[x+i][y+j] == VIDE: # on ne regarde pas les cases en diagonale
                 pores_vides_new.append((x+i, y+j)) # Les couples de coordonnées sont enregistrés en tuples ()
     return pores_vides_new
-    
-
-    
-
 
 
 def vecteur_espace(dim):
@@ -127,10 +107,6 @@ def initialisation_eau_mouvante(espace):
                 eau_mouvante.append((i,0,j))
     return eau_mouvante
 
-
-
-
-from random import random
 
 def espace(n, p, q, indice=.5):
     """Création d'une matrice modélisant une roche poreuse aléatoire."""
@@ -169,24 +145,5 @@ def bords(espace):
     espace.insert(0,matrice_fond)
     espace.append(matrice_fond)
     return espace
-
-
-#if __name__ == '__main__':
-#    data = -1
-#    while data != None:
-#        data = input("Entrez 4 args ")
-#        percolation(data[0], data[1], data[2], data[3])
-
-
-
-#  ==[ COMMENTAIRES ]==
-
-#Vous devez définir clairement vos variables par leur nom
-
-#Ne jamais prendre de lettre majuscule en nom de variable.
-
-#Utilisez xrange() au lieu de range() si la liste est statique. Ça passe un itérateur à la structure for au lieu de passer une liste, c'est bien bien bien plus efficace.
-
-#Ne mélangez pas les fonctions et le display. Tout ce qui doit tourner de manière effective au lancement du script doit être dans "if __name__ == '__main__':", le reste c'est des fonctions. Vous pouvez ainsi concevoir et réutiliser votre code comme un module.
 
 
