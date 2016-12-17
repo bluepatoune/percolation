@@ -5,7 +5,7 @@
 
 from matplotlib    import pyplot
 from matplotlib    import colors
-from random import random
+from random        import random
 
 EAU_MOUVANTE = 3
 EAU = 2
