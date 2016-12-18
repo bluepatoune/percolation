@@ -1,12 +1,13 @@
-# Créé par cpetroff, le 28/11/2016 en Pytho
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Percolation.py: Un module python pour effectuer des percolations matricielles."""
+"""Percolation.py: Un module python pour effectuer des percolations matricielles.
+"""
 
-from matplotlib    import pyplot
-from matplotlib    import colors
-from random        import random
+from matplotlib           import pyplot
+from matplotlib           import colors
+from mpl_toolkits.mplot3d import Axes3D
+from random               import random
 
 EAU_MOUVANTE = 3
 EAU = 2
@@ -14,97 +15,107 @@ VIDE = 1
 ROCHE = 0
 NEANT = -1
 
-couleurs = ['black', 'grey' , 'white', 'blue', 'cyan']
-valeurs  = [ NEANT ,  ROCHE ,  VIDE  ,  EAU  ,  EAU_MOUVANTE]
+clrs = {NEANT:        None  ,
+        ROCHE:       'grey' ,
+        VIDE:        'white',
+        EAU:         'blue' ,
+        EAU_MOUVANTE:'cyan' }
 
-def modelisation(n, p, indice=0.5):
+def draw(matrix3d, subplot, clrs):
+    for x, matrix2d in enumerate(matrix3d):
+        for y, line in enumerate(matrix2d):
+            for z, coef in enumerate(line):
+                if clrs[coef] != None:
+                    subplot.scatter(z, y, -x, c=clrs[coef])
+                
+def modelisation(n, p, q, indice=0.5):
     esp = espace(n, p, q, indice)
     esp = pluie(esp)
     return percolation(esp)
 
-
 def percolation(espace):  # methode 2
     """ Indique s'il y a percolation ou pas """
-
-    cmap = colors.ListedColormap(couleurs) # TODO: Relève du display, à mettre ailleurs.
-    norm = colors.BoundaryNorm(valeurs + [max(valeurs)+1], cmap.N)
-    pyplot.matshow([valeurs], 1, cmap=cmap, norm=norm)
+    
+    fig = pyplot.figure()
+    subplot = fig.add_subplot(111, projection='3d')
+    subplot.set_xlabel('X')
+    subplot.set_ylabel('Y')
+    subplot.set_zlabel('Z')
+    
+    draw([[[-1, 0, 1, 2, 3]]], subplot, clrs)
     pyplot.pause(1)
-
+    print( espace )
     eau_mouvante = initialisation_eau_mouvante(espace)
+    
     while eau_mouvante != []:
-
-        pyplot.matshow(matrice, 1, cmap=cmap, norm=norm) # TODO: Séparer la logique de display de la logique de génération (threads ?)
+        draw(espace, subplot, clrs)
         pyplot.pause(.0001)
 
         eau_mouvante = propagation(espace,eau_mouvante)
+    
     return resultat(espace)
 
 
-def propagation(espace, eau_mouvante):
+def propagation(espace, eau_mouvante):# done 
      pores_vides = []
      pores_vides_locale = []
-     for (x, y) in eau_mouvante:
-        pores_vides_locale = regard(matrice, x, y)
-        matrice = infiltration(matrice, pores_vides_locale)
-        matrice[x][y] = EAU
+     for (x, y, z) in eau_mouvante:
+        pores_vides_locale = regard(espace, x, y, z)
+        matrice = infiltration(espace, pores_vides_locale)
+        matrice[x][y][z] = EAU
         pores_vides += pores_vides_locale
-     eau_mouvante = pores_vides[:]
+     eau_mouvante = pores_vides[:] # à changer 
      return eau_mouvante
 
 
-def resultat(espace):
-    for matrice in espace:
-        for coef in matrice[len(matrice)-2]: # on parcourt l'avant dernière ligne de la matrice
+def resultat(espace): # done 
+    for ligne in espace[len(espace)-2]: # on parcourt l'avant dernière ligne de la matrice
+        for coef in ligne:
             if coef == EAU or coef == EAU_MOUVANTE:
                 return True
     return False
 
-def pluie(espace):
+def pluie(espace): # done 
     """Ajoute de l'eau en surface."""
-    for i, matrice in enumerate(espace):
-        for j, coef in enumerate(matrice[0]): # enumerate renvoie une liste de tuples (indice, valeur)
+    for y, ligne in enumerate(espace[0]): # matrice du haut ( axe x en hauteur )
+        for z, coef in enumerate(ligne): # enumerate renvoie une liste de tuples (indice, valeur)
             if coef == VIDE:
-                matrice[0][j] = EAU_MOUVANTE
+                espace[0][y][z] = EAU_MOUVANTE
     return espace
 
-def regard(espace, x, y, z):
+def regard(espace, x, y, z):#done
     """Renvoie la liste des coordonnées des pores vides autour d'une case."""
-    pores_vides_new = []
-    for i in [-1, 0, 1]:
-        for j in [-1, 0, 1]:
-            if (i == 0 or j == 0) and matrice[x+i][y+j] == VIDE: # on ne regarde pas les cases en diagonale
-                pores_vides_new.append((x+i, y+j)) # Les couples de coordonnées sont enregistrés en tuples ()
-    return pores_vides_new
+    pores_vides = []
+    for vecteur in vecteur_espace(3):
+         coords = (x+vecteur[0], y+vecteur[1], z+vecteur[2])
+         if espace[coords[0]][coords[1]][coords[2]] == VIDE: 
+                pores_vides.append(coords)
+    return pores_vides
+ 
+
+def vecteur_espace(dim):#done
+    """Renvoie une liste des vecteurs possibles de déplacement dans l'espace."""
+    vecteurs = []
+    for direction in range(dim):
+        for sens in [-1, 1]:
+            vecteur = [0]*dim
+            vecteur[direction] = sens
+            vecteurs.append(vecteur)
+    return vecteurs
 
 
-def vecteur_espace(dim):
-    sens=[-1,1]
-    liste_vecteurs = []
-    for d in range(dim):
-        direction=[]
-        for v in range(2):
-            vecteur = dim*[0]
-            vecteur[d]= sens[v]
-            direction.append(vecteur)
-        liste_vecteurs.append(direction)
-    return liste_vecteurs
-
-
-def infiltration(espace, pores_vides):
+def infiltration(espace, pores_vides):# done
     """Ajoute de l'eau dans les pores vides."""
-    for (x, y) in pores_vides: # On itère sur la liste par tuples
-        for matrice in espace :
-            matrice[x][y] = EAU_MOUVANTE
+    for (x, y, z) in pores_vides: # On itère sur la liste par tuples
+        espace[x][y][z] = EAU_MOUVANTE
     return espace
 
-
-def initialisation_eau_mouvante(espace):
+def initialisation_eau_mouvante(espace):#done 
     eau_mouvante = []
-    for i, matrice in enumerate(espace):
-        for j, coef in enumerate(matrice[0]):
+    for y, ligne in enumerate(espace[0]): 
+        for z, coef in enumerate(ligne):
             if coef == EAU_MOUVANTE:
-                eau_mouvante.append((i,0,j))
+                eau_mouvante.append((0, y, z))
     return eau_mouvante
 
 
@@ -117,20 +128,20 @@ def espace(n, p, q, indice=.5):
 
 def zero(n, p, q):
     """ crééer une matrice de zéros de taille n,p,q """
-    matrice = [0]*n
+    espace = [0]*n
     for i in range(n):
-        matrice[i] = [0]*p
+        espace[i] = [0]*p
         for j in range(p):
-            matrice[i][j]=[0]*q
-    return matrice
+            espace[i][j]=[0]*q
+    return espace
 
 def pores(espace, indice=.5):
     """Introduit des pores vides au hasard, en fonction de l'indice de porosité i."""
-    for i, matrice in enumerate(espace):
-        for j, ligne in enumerate(matrice):
-            for k, coeff in enumerate(ligne):
+    for x, matrice in enumerate(espace):
+        for y, ligne in enumerate(matrice):
+            for z, coeff in enumerate(ligne):
                 if random() < indice:
-                    espace[i][j][k] = VIDE
+                    espace[x][y][z] = VIDE
     return espace
 
 def bords(espace):
@@ -141,9 +152,10 @@ def bords(espace):
             ligne.append(NEANT)
         ligne_bas = [NEANT] * len(matrice[0])
         matrice.append(ligne_bas)
+        matrice.insert(0, ligne_bas)
     matrice_fond=[ligne_bas]*len(espace[0])
-    espace.insert(0,matrice_fond)
     espace.append(matrice_fond)
     return espace
 
-
+if __name__ == '__main__':
+    print(modelisation(3, 3, 3))
