@@ -1,16 +1,23 @@
-# percolation.py
-
+# Percolation.py
 Modélise l'écoulement de l'eau dans la roche.
 
 ## Format de codage des matrices :
-0 modélise la roche 
-1 modélise le vide 
--1 modélise le néant
+Pour une matrice de dimension 2 :
  ```
  [[-1, 1, 1, 0,  0,  1, 1, -1],
  [-1, 1, 1, 0,  0,  1, 1, -1],
  [-1, 1, 1, 0,  0,  1, 1, -1],
  [-1, -1, -1, -1, -1, -1, -1, -1]]
  ```
-Le nombre de 1 est déterminé par un indice en argument 
 
+## Convention de codage
+| Valeur | Signification |
+| -------| ------------- |
+| -1     | Mur           |
+| 0      | Roche         |
+| 1      | Air           |
+| 2      | Eau           |
+| 3      | Eau mouvante  |
+
+## Génération
+Le taux de roche est modulé par l'**indice de porosité**.

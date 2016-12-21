@@ -1,100 +1,100 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Percolation.py: Un module python pour effectuer des percolations matricielles.
-"""
+"""Percolation.py: Un module python pour effectuer des percolations matricielles."""
 
 from matplotlib           import pyplot
 from matplotlib           import colors
 from mpl_toolkits.mplot3d import Axes3D
 from random               import random
 
+NEANT        = -1
+ROCHE        = 0
+VIDE         = 1
+EAU          = 2
 EAU_MOUVANTE = 3
-EAU = 2
-VIDE = 1
-ROCHE = 0
-NEANT = -1
 
-clrs = {NEANT:        None  ,
-        ROCHE:       'grey' ,
-        VIDE:        'white',
-        EAU:         'blue' ,
-        EAU_MOUVANTE:'cyan' }
+couleurs = {NEANT:        None  ,
+            ROCHE:       'grey' ,
+            VIDE:        'white',
+            EAU:         'blue' ,
+            EAU_MOUVANTE:'cyan' }
 
-def draw(matrix3d, subplot, clrs):
-    for x, matrix2d in enumerate(matrix3d):
-        for y, line in enumerate(matrix2d):
+def draw(espace, subplot, clrs):
+    """Dessine chaque coeficient de la matrice comme un point de plot 3D."""
+    for x, matrice in enumerate(espace):
+        for y, line in enumerate(matrice):
             for z, coef in enumerate(line):
-                if clrs[coef] != None:
-                    subplot.scatter(z, y, -x, c=clrs[coef])
-                
+                if couleurs[coef] != None:
+                    subplot.scatter(z, y, -x, c=couleurs[coef])
+
 def modelisation(n, p, q, indice=0.5):
     esp = espace(n, p, q, indice)
     esp = pluie(esp)
     return percolation(esp)
 
-def percolation(espace):  # methode 2
-    """ Indique s'il y a percolation ou pas """
-    
+def percolation(espace):
+    """Dessine la propagation de l'eau, et indique s'il y a percolation."""
     fig = pyplot.figure()
     subplot = fig.add_subplot(111, projection='3d')
-    subplot.set_xlabel('X')
+    subplot.set_xlabel('Z')
     subplot.set_ylabel('Y')
-    subplot.set_zlabel('Z')
-    
-    draw([[[-1, 0, 1, 2, 3]]], subplot, clrs)
+    subplot.set_zlabel('-X')
+
+    draw([[[-1, 0, 1, 2, 3]]], subplot, couleurs)
     pyplot.pause(1)
-    print( espace )
+
     eau_mouvante = initialisation_eau_mouvante(espace)
-    
     while eau_mouvante != []:
-        draw(espace, subplot, clrs)
+        draw(espace, subplot, couleurs)
         pyplot.pause(.0001)
 
-        eau_mouvante = propagation(espace,eau_mouvante)
-    
+        eau_mouvante = propagation(espace, eau_mouvante)
+
     return resultat(espace)
 
 
-def propagation(espace, eau_mouvante):# done 
-     pores_vides = []
-     pores_vides_locale = []
-     for (x, y, z) in eau_mouvante:
+def propagation(espace, eau_mouvante):
+    """Propage l'eau mouvante dans les cases d'air."""
+    pores_vides = []
+    pores_vides_locale = []
+    for (x, y, z) in eau_mouvante:
         pores_vides_locale = regard(espace, x, y, z)
         matrice = infiltration(espace, pores_vides_locale)
         matrice[x][y][z] = EAU
         pores_vides += pores_vides_locale
-     eau_mouvante = pores_vides[:] # à changer 
-     return eau_mouvante
+    eau_mouvante = list(pores_vides)
+    return eau_mouvante
 
 
-def resultat(espace): # done 
-    for ligne in espace[len(espace)-2]: # on parcourt l'avant dernière ligne de la matrice
+def resultat(espace):
+    """Indique s'il y a percolation ou pas."""
+    for ligne in espace[len(espace)-2]: # On parcourt l'avant dernière ligne de la matrice
         for coef in ligne:
             if coef == EAU or coef == EAU_MOUVANTE:
                 return True
     return False
 
-def pluie(espace): # done 
+def pluie(espace):
     """Ajoute de l'eau en surface."""
-    for y, ligne in enumerate(espace[0]): # matrice du haut ( axe x en hauteur )
-        for z, coef in enumerate(ligne): # enumerate renvoie une liste de tuples (indice, valeur)
+    for y, ligne in enumerate(espace[0]):
+        for z, coef in enumerate(ligne):
             if coef == VIDE:
                 espace[0][y][z] = EAU_MOUVANTE
     return espace
 
-def regard(espace, x, y, z):#done
+def regard(espace, x, y, z):
     """Renvoie la liste des coordonnées des pores vides autour d'une case."""
     pores_vides = []
     for vecteur in vecteur_espace(3):
          coords = (x+vecteur[0], y+vecteur[1], z+vecteur[2])
-         if espace[coords[0]][coords[1]][coords[2]] == VIDE: 
+         if espace[coords[0]][coords[1]][coords[2]] == VIDE:
                 pores_vides.append(coords)
     return pores_vides
- 
 
-def vecteur_espace(dim):#done
-    """Renvoie une liste des vecteurs possibles de déplacement dans l'espace."""
+
+def vecteur_espace(dim):
+    """Renvoie une liste des vecteurs de déplacement dans l'espace possibles."""
     vecteurs = []
     for direction in range(dim):
         for sens in [-1, 1]:
@@ -104,15 +104,15 @@ def vecteur_espace(dim):#done
     return vecteurs
 
 
-def infiltration(espace, pores_vides):# done
+def infiltration(espace, pores_vides):
     """Ajoute de l'eau dans les pores vides."""
-    for (x, y, z) in pores_vides: # On itère sur la liste par tuples
+    for (x, y, z) in pores_vides:
         espace[x][y][z] = EAU_MOUVANTE
     return espace
 
-def initialisation_eau_mouvante(espace):#done 
+def initialisation_eau_mouvante(espace): # TODO: Redondance avec pluie()
     eau_mouvante = []
-    for y, ligne in enumerate(espace[0]): 
+    for y, ligne in enumerate(espace[0]):
         for z, coef in enumerate(ligne):
             if coef == EAU_MOUVANTE:
                 eau_mouvante.append((0, y, z))
@@ -126,8 +126,8 @@ def espace(n, p, q, indice=.5):
     espace = bords(espace)
     return espace
 
-def zero(n, p, q):
-    """ crééer une matrice de zéros de taille n,p,q """
+def zero(n, p, q): # TODO: Facile à généraliser en n dimensions avec une fonction récursive...
+    """Crée une matrice de zéros de taille (n, p, q)."""
     espace = [0]*n
     for i in range(n):
         espace[i] = [0]*p
@@ -144,18 +144,18 @@ def pores(espace, indice=.5):
                     espace[x][y][z] = VIDE
     return espace
 
-def bords(espace):
-    """On borde la matrice de -1, sur trois côtés."""
+def bords(espace): # TODO: Facile à généraliser en n dimensions avec une fonction récursive...
+    """On borde l'espace de NEANT, sur tous ses côtés, sauf le supérieur."""
     for matrice in espace:
         for ligne in matrice:
-            ligne.insert(0, NEANT)
+            ligne.insert(0, NEANT) # HACK: ligne = [NEANT] + ligne + [NEANT] ?
             ligne.append(NEANT)
-        ligne_bas = [NEANT] * len(matrice[0])
-        matrice.append(ligne_bas)
+        ligne_bas = [NEANT]*len(matrice[0])
+        matrice.append(ligne_bas) # HACK: ligne = [NEANT] + ligne + [NEANT] ?
         matrice.insert(0, ligne_bas)
-    matrice_fond=[ligne_bas]*len(espace[0])
+    matrice_fond = [ligne_bas]*len(espace[0])
     espace.append(matrice_fond)
     return espace
 
-if __name__ == '__main__':
-    print(modelisation(3, 3, 3))
+if __name__ == '__main__': # Fonction de test
+    print(modelisation(8, 8, 8))
