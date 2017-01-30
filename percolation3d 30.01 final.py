@@ -13,6 +13,7 @@ ROCHE        = 0
 VIDE         = 1
 EAU          = 2
 EAU_MOUVANTE = 3
+DIM          = 3
 
 couleurs = {NEANT:        None  ,
             ROCHE:       'grey' ,
@@ -32,12 +33,12 @@ def draw(espace, subplot, clrs):
                 if couleurs[coef] != None:
                     subplot.scatter(z, y, -x, c=couleurs[coef])
 
-def modelisation(n, p, q, dim, indice = 0.5, affichage = True):
+def modelisation(n, p, q, indice = 0.5, affichage = True):
     """réalisation d'une propagation d'eau à travers un sol rocheux, retourne True si il y a percolation """
     etape_1 = initialisation(n, p, q, indice)
     eau_mouvante1 = etape_1[1]
     esp = etape_1[0]
-    liste_vecteurs = vecteurs_espace(dim) 
+    liste_vecteurs = vecteurs_espace(DIM) 
     return percolation(esp, liste_vecteurs, eau_mouvante1, affichage)
 
 def percolation(espace, liste_vecteurs, eau_mouvante1, affichage):
@@ -61,7 +62,6 @@ def percolation(espace, liste_vecteurs, eau_mouvante1, affichage):
         eau_mouvante = propagation(espace, eau_mouvante, liste_vecteurs)
 
     return resultat(espace)
-
 
 def propagation(espace, eau_mouvante, liste_vecteurs):
     """Propage l'eau mouvante dans les cases vides."""
@@ -88,22 +88,6 @@ def resultat(espace):
                 return True
     return False
     
-def resultat(espace):
-    matrice = espace[len(espace)-2]
-    y = 0
-    z = 0
-    p = len(matrice)-2
-    q = len(matrice[0])-2
-    while y <= p and (matrice[y][z] != EAU or matrice[y][z] != EAU_MOUVANTE):
-        z += 1
-        if z == q:
-            y += 1
-            z = 0
-    if y == p+1:
-        return False
-    else :
-        return True
-        
 def resultat(espace): # rendre ca jolie 
     matrice = espace[len(espace)-2]
     y = 0
@@ -120,7 +104,6 @@ def resultat(espace): # rendre ca jolie
         return False
     else :
         return True
-
     
 def vecteurs_espace(dim):
     """Renvoie une liste des vecteurs possibles déplacement dans l'espace ."""
@@ -132,7 +115,7 @@ def vecteurs_espace(dim):
             liste_vecteurs.append(vecteur)
     return liste_vecteurs
 
-def regard(espace, x, y, z, liste_vecteurs):
+def regard(espace, x, y, z, liste_vecteurs): # changer de nom 
     """Renvoie la liste des coordonnées des pores vides autour d'une case d'eau mouvante."""
     pores_vides = []
     for vecteur in liste_vecteurs:
@@ -196,4 +179,4 @@ def bords(espace): # TODO: Facile à généraliser en n dimensions avec une fonc
     return espace
 
 if __name__ == '__main__': # Fonction de test
-    print(modelisation(8, 8, 8, 3, 0.9, False))
+    print(modelisation(8, 8, 8, 0.9, False))
