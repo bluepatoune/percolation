@@ -73,17 +73,17 @@ def percolation(espace, liste_vecteurs, eau_mouvante1, affichage):
         subplot.set_ylabel('Y')
         subplot.set_zlabel('-X')
 
-        draw([[[-1, 0, 1, 2, 3]]], subplot, couleurs)
+        draw([[[-1, 0, 1, 2, 3]]], subplot, couleurs) # TODO : pas necessaire 
         pyplot.pause(1)
 
     eau_mouvante = eau_mouvante1
     while eau_mouvante != []:               # Si il n'y a plus de d'eau mouvante dans l'espace 
+        eau_mouvante = propagation(espace, eau_mouvante, liste_vecteurs)
+        
         if affichage == True:
             draw(espace, subplot, couleurs)
             pyplot.pause(.0001)
-
-        eau_mouvante = propagation(espace, eau_mouvante, liste_vecteurs)
-
+            
     return resultat(espace)
 
 def propagation(espace, eau_mouvante, liste_vecteurs):
