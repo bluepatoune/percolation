@@ -28,7 +28,7 @@ couleurs = {NEANT:        None  ,
             EAU_MOUVANTE:'cyan' }
 
 def draw(espace, subplot, clrs):
-    """Dessine chaque coeficient de la matrice comme un point de plot 3D."""
+    """Dessine chaque coefficient de la matrice comme un point de plot 3D."""
     for x, matrice in enumerate(espace):
         for y, line in enumerate(matrice):
             for z, coef in enumerate(line):
@@ -36,7 +36,7 @@ def draw(espace, subplot, clrs):
                     subplot.scatter(z, y, -x, c=couleurs[coef])
 
 def modelisation(n, p, q, indice = 0.5, affichage = True):
-    """réalisation d'une propagation d'eau à travers un sol rocheux, retourne True si il y a percolation """
+    """Réalisation d'une propagation d'eau à travers un sol rocheux, retourne True si il y a percolation. """
     esp = espace(n, p, q, indice=.5)        # On crée un espace de départ de façon aléatoire
     etape_1 = initialisation(esp, indice) 
     eau_mouvante1 = etape_1[1]              # Les premières coordonnées d'eau mouvante 
@@ -45,7 +45,7 @@ def modelisation(n, p, q, indice = 0.5, affichage = True):
     return percolation(esp, liste_vecteurs, eau_mouvante1, affichage)
     
 def initialisation(esp, indice):
-    """ Retourne l'espace une fois que la pluie est tombée et les premières coordonnées de l'eau mouvante """
+    """ Retourne l'espace une fois que la pluie est tombée et les premières coordonnées de l'eau mouvante. """
     eau_mouvante = []
     for y, ligne in enumerate(esp[0]):
         for z, coef in enumerate(ligne):
@@ -133,9 +133,9 @@ def resultat(espace):
     
 def espace(n, p, q, indice=.5):
     """Création d'une matrice modélisant une roche poreuse aléatoire."""
-    espace = zero(n, p, q)              # On crée la un volume rocheux 
+    espace = zero(n, p, q)              # On crée un volume rocheux 
     espace = pores(espace, indice)      # On ajoute des pores dans la roche 
-    espace = bords(espace)              # On ajoute des limite au volume 
+    espace = bords(espace)              # On ajoute des limites au volume 
     return espace
 
 def zero(n, p, q): 
@@ -152,12 +152,12 @@ def pores(espace, indice=.5):
     for x, matrice in enumerate(espace):
         for y, ligne in enumerate(matrice):
             for z, coeff in enumerate(ligne):
-                if random() < indice:           # l' ajout de vide est aléatoire et dépend de l'indice de porosité
+                if random() < indice:           # L' ajout de vide est aléatoire et dépend de l'indice de porosité
                     espace[x][y][z] = VIDE
     return espace
 
 def bords(espace):
-    """On borde l'espace de NEANT, sur tous ses côtés, sauf à la surface."""
+    """Borde l'espace de NEANT, sur tous ses côtés, sauf à la surface."""
     for matrice in espace:                      # On borde chaque matrice de néant 
         for ligne in matrice:
             ligne.insert(0, NEANT) 
