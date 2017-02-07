@@ -116,17 +116,17 @@ def infiltration(espace, pores_vides):
 def resultat(espace): 
     """Indique s'il y a percolation ou pas."""
     matrice = espace[len(espace)-2]          # On ne considère que l'avant dernière matrice 
-    y = 0
-    z = 0
+    ligne = 0
+    coef = 0
     p = len(matrice)-2                      # nombre de lignes dans chaque matrices 
     q = len(matrice[0])-2                   # nombre de coefficients dans chaque lignes
-    while y <= p and matrice[y][z] != EAU: # TODO remarquez que ce n'est ps possible d'avoir de l'eau mouvante , tel que propagation est fait 
-        if z != q:  # Si on est pas arrivé au bout de la ligne 
-            z += 1  # On considère le coefficient suivant 
+    while ligne <= p and matrice[ligne][coef] != EAU: # TODO remarquez que ce n'est ps possible d'avoir de l'eau mouvante , tel que propagation est fait 
+        if coef != q:  # Si on est pas arrivé au bout de la ligne 
+            coef += 1  # On considère le coefficient suivant 
         else: 
-            y += 1  # On considère la ligne suivante 
-            z = 0
-    if y == p+1:    # Si on a parcouru toute la matrice sans trouver d'eau 
+            ligne += 1  # On considère la ligne suivante 
+            coef = 0
+    if ligne == p+1:    # Si on a parcouru toute la matrice sans trouver d'eau 
         return False
     else :
         return True
