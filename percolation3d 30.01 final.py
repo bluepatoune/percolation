@@ -26,26 +26,41 @@ couleurs = {NEANT:        None  ,
             VIDE:         None,
             EAU:         'blue' ,
             EAU_MOUVANTE:'cyan' }
-
+            
 def draw(espace, subplot, clrs):
-    """Dessine chaque coefficient de la matrice comme un point de plot 3D."""
+    """Dessine chaque coeficient de la matrice comme un point de plot 3D."""
     for x, matrice in enumerate(espace):
         for y, line in enumerate(matrice):
             for z, coef in enumerate(line):
                 if couleurs[coef] != None:
                     subplot.scatter(z, y, -x, c=couleurs[coef])
+            
+def comptage_des_ilots(n, p, q, indice = 0.5):
+    esp = espace(n, p, q, indice=.5)        # On crée un espace de départ de façon aléatoire
+    liste_vecteurs = vecteurs_espace(DIM)   # Liste des vecteurs possibles déplacement dans l'espace
+    compteur = 0
+    for x, matrice in enumerate(esp):
+        for y, ligne in enumerate(matrice): # TODO : ca ne sert à rien de lui faire parcourir les -1
+            for z, coef in enumerate(ligne):
+                if coef == VIDE:
+                    compteur += 1
+                    esp[x][y][z] = EAU_MOUVANTE 
+                    eau_mouvante1 = [(x,y,z)] 
+                    esp = percolation(esp, liste_vecteurs, eau_mouvante1,False)
+    return compteur
 
 def modelisation(n, p, q, indice = 0.5, affichage = True):
-    """Réalisation d'une propagation d'eau à travers un sol rocheux, retourne True si il y a percolation. """
+    """réalisation d'une propagation d'eau à travers un sol rocheux, retourne True si il y a percolation """
     esp = espace(n, p, q, indice=.5)        # On crée un espace de départ de façon aléatoire
+    liste_vecteurs = vecteurs_espace(DIM)   # Liste des vecteurs possibles déplacement dans l'espace
     etape_1 = initialisation(esp, indice) 
     eau_mouvante1 = etape_1[1]              # Les premières coordonnées d'eau mouvante 
     esp = etape_1[0]                        # L'ancien espace est remplacé par le nouveau 
-    liste_vecteurs = vecteurs_espace(DIM)   # Liste des vecteurs possibles déplacement dans l'espace
-    return percolation(esp, liste_vecteurs, eau_mouvante1, affichage)
+    esp = percolation(esp, liste_vecteurs, eau_mouvante1, affichage)
+    return resultat(esp)
     
 def initialisation(esp, indice):
-    """ Retourne l'espace une fois que la pluie est tombée et les premières coordonnées de l'eau mouvante. """
+    """ Retourne l'espace une fois que la pluie est tombée et les premières coordonnées de l'eau mouvante """
     eau_mouvante = []
     for y, ligne in enumerate(esp[0]):
         for z, coef in enumerate(ligne):
@@ -73,7 +88,7 @@ def percolation(espace, liste_vecteurs, eau_mouvante1, affichage):
         subplot.set_ylabel('Y')
         subplot.set_zlabel('-X')
 
-        draw([[[-1, 0, 1, 2, 3]]], subplot, couleurs) # TODO : pas necessaire 
+        draw([[[-1, 0, 1, 2, 3]]], subplot, couleurs)
         pyplot.pause(1)
 
     eau_mouvante = eau_mouvante1
@@ -84,10 +99,10 @@ def percolation(espace, liste_vecteurs, eau_mouvante1, affichage):
             draw(espace, subplot, couleurs)
             pyplot.pause(.0001)
             
-    return resultat(espace)
+    return espace
 
 def propagation(espace, eau_mouvante, liste_vecteurs):
-    """Propage l'eau mouvante dans les cases vides."""
+    """Renvoie les coordonnées des nouvelles cases d'eau mouvante après propagation de l'eau."""
     pores_vides = []
     pores_vides_locale = []                 # Nécessaire pour ne pas enregistrer 2 fois un même pore 
     for (x, y, z) in eau_mouvante:
@@ -116,26 +131,26 @@ def infiltration(espace, pores_vides):
 def resultat(espace): 
     """Indique s'il y a percolation ou pas."""
     matrice = espace[len(espace)-2]          # On ne considère que l'avant dernière matrice 
-    ligne = 0
-    coef = 0
+    y = 0
+    z = 0
     p = len(matrice)-2                      # nombre de lignes dans chaque matrices 
     q = len(matrice[0])-2                   # nombre de coefficients dans chaque lignes
-    while ligne <= p and matrice[ligne][coef] != EAU: # TODO remarquez que ce n'est ps possible d'avoir de l'eau mouvante , tel que propagation est fait 
-        if coef != q:  # Si on est pas arrivé au bout de la ligne 
-            coef += 1  # On considère le coefficient suivant 
+    while y <= p and matrice[y][z] != EAU: # TODO remarquez que ce n'est ps possible d'avoir de l'eau mouvante , tel que propagation est fait 
+        if z != q:  # Si on est pas arrivé au bout de la ligne 
+            z += 1  # On considère le coefficient suivant 
         else: 
-            ligne += 1  # On considère la ligne suivante 
-            coef = 0
-    if ligne == p+1:    # Si on a parcouru toute la matrice sans trouver d'eau 
+            y += 1  # On considère la ligne suivante 
+            z = 0
+    if y == p+1:    # Si on a parcouru toute la matrice sans trouver d'eau 
         return False
     else :
         return True
     
 def espace(n, p, q, indice=.5):
     """Création d'une matrice modélisant une roche poreuse aléatoire."""
-    espace = zero(n, p, q)              # On crée un volume rocheux 
+    espace = zero(n, p, q)              # On crée la un volume rocheux 
     espace = pores(espace, indice)      # On ajoute des pores dans la roche 
-    espace = bords(espace)              # On ajoute des limites au volume 
+    espace = bords(espace)              # On ajoute des limite au volume 
     return espace
 
 def zero(n, p, q): 
@@ -152,12 +167,12 @@ def pores(espace, indice=.5):
     for x, matrice in enumerate(espace):
         for y, ligne in enumerate(matrice):
             for z, coeff in enumerate(ligne):
-                if random() < indice:           # L' ajout de vide est aléatoire et dépend de l'indice de porosité
+                if random() < indice:           # l' ajout de vide est aléatoire et dépend de l'indice de porosité
                     espace[x][y][z] = VIDE
     return espace
 
 def bords(espace):
-    """Borde l'espace de NEANT, sur tous ses côtés, sauf à la surface."""
+    """On borde l'espace de NEANT, sur tous ses côtés, sauf à la surface."""
     for matrice in espace:                      # On borde chaque matrice de néant 
         for ligne in matrice:
             ligne.insert(0, NEANT) 
@@ -170,7 +185,10 @@ def bords(espace):
     return espace
 
 if __name__ == '__main__': # Fonction de test
-    print(modelisation(8, 8, 8, 0.9, False))
+    print(comptage_des_ilots(3, 3, 3, 0.9))
+    print(modelisation(3, 3, 3, 0.9))
+    
+#TODO: prendre en argument le meme espace pour les 2 fonction 
     
 # Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande 
 
