@@ -1,7 +1,7 @@
 
 """Percolation.py: Un module python pour effectuer des percolations matricielles."""
 
-# Fonction de test
+# Fonctions de test
 # main(2,3,4,0.5)
 # maximum_alveoles(3,3,3,100,200)
 
@@ -46,13 +46,13 @@ def maximum_alveoles(n, p, q, N, P):
     moyenne_alveoles = []
     indice = []
     liste_vecteurs = vecteurs_espace(DIM) 
-    for d in range(N+1): # N: le pas 
+    for d in range(N+1):    # N: le nombre d'indices évalués  
         indice += [d/N]
         nombre_alveoles = 0
-        for e in range(P):
+        for e in range(P):  # P : taille de l'échantillon statistique pour chaque indice 
             espace = creation_espace(n, p, q, d/N) 
             nombre_alveoles += comptage_des_alveoles(espace, liste_vecteurs)
-        moyenne_alveoles += [nombre_alveoles/P]
+        moyenne_alveoles += [nombre_alveoles/P]     # moyenne empirique 
     pyplot.plot(indice, moyenne_alveoles,'g*',)
     return indice, moyenne_alveoles
             
@@ -80,18 +80,18 @@ def main (n, p, q, i, affichage = True):
     
 def creation_espace(n, p, q, indice=.5):
     """Création d'une matrice modélisant une roche poreuse aléatoire."""
-    espace = zero(n, p, q)              # On crée la un volume rocheux 
+    espace = zero(n, p, q)              # On crée un volume rocheux 
     espace = pores(espace, indice)      # On ajoute des pores dans la roche 
-    espace = bords(espace)              # On ajoute des limite au volume 
+    espace = bords(espace)              # On ajoute des limites au volume 
     return espace
 
 def zero(n, p, q): 
     """Crée une matrice de zéros de taille n, p, q."""
-    espace = [0]*n
+    espace = [ROCHE]*n
     for i in range(n):
-        espace[i] = [0]*p
+        espace[i] = [ROCHE]*p
         for j in range(p):
-            espace[i][j]=[0]*q
+            espace[i][j]=[ROCHE]*q
     return espace
 
 def pores(espace, indice=.5):
@@ -99,10 +99,10 @@ def pores(espace, indice=.5):
     for x, matrice in enumerate(espace):
         for y, ligne in enumerate(matrice):
             for z, coeff in enumerate(ligne):
-                if random() < indice:         # l' ajout de vide est aléatoire et dépend de l'indice de porosité
+                if random() < indice:   
                     espace[x][y][z] = VIDE
     return espace
-    # Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande 
+  # Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande   
     
 def bords(espace):
     """On borde l'espace de NEANT, sur tous ses côtés, sauf à la surface."""
