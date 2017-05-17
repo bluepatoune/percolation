@@ -12,6 +12,7 @@ ROCHE        = 0
 VIDE         = 1
 EAU          = 2
 EAU_MOUVANTE = 3
+DIM          = 2
 
 couleurs = ['black', 'grey' , 'white', 'blue', 'cyan']
 valeurs  = [ NEANT ,  ROCHE ,  VIDE  ,  EAU  ,  EAU_MOUVANTE]
@@ -65,15 +66,35 @@ def pluie(matrice):
             matrice[0][i] = EAU_MOUVANTE
     return matrice
 
-def regard(matrice, x, y):
-    """Renvoie la liste des coordonnées des pores vides autour d'une case."""
+"""def regard(matrice, x, y):
+    #Renvoie la liste des coordonnées des pores vides autour d'une case.
     pores_vides_new = []
     for i in [-1, 0, 1]:
         for j in [-1, 0, 1]:
             if (i == 0 or j == 0) and matrice[x+i][y+j] == VIDE: # On ne regarde pas les cases en diagonale
                 pores_vides_new.append((x+i, y+j)) # Les couples de coordonnées sont enregistrés en tuples (x, y)
-    return pores_vides_new
-# liste vecteur en argument
+    return pores_vides_new"""
+
+
+def regard(espace, x, y):
+    """Renvoie la liste des coordonnées des pores vides autour d'une case."""
+    pores_vides = []
+    for vecteur in vecteur_espace(DIM):
+         coords = (x+vecteur[0], y+vecteur[1])
+         if espace[coords[0]][coords[1]] == VIDE:
+                pores_vides.append(coords)
+    return pores_vides
+
+
+def vecteur_espace(dim):
+    """Renvoie une liste des vecteurs de déplacement dans l'espace possibles."""
+    vecteurs = []
+    for direction in range(dim):
+        for sens in [-1, 1]:
+            vecteur = [0]*dim
+            vecteur[direction] = sens
+            vecteurs.append(vecteur)
+    return vecteurs
 
 def initialisation_eau_mouvante(matrice):
     eau_mouvante = []
@@ -120,4 +141,4 @@ def bords(matrice):
     return matrice
 
 if __name__ == '__main__': # Fonction de test
-    print(modelisation(512, 512, 0.6))
+    print(modelisation(100, 100, 0.6))
