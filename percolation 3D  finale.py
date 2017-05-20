@@ -42,14 +42,14 @@ def zero(n, p, q):
     return espace
 
 def pores(espace, indice=.5):
-    """Introduit des pores vides au hasard, en fonction de l'indice de porosité."""
+    """Introduit des pores vides au hasard, en fonction de l'indice de porosité.
+       Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande."""
     for x, matrice in enumerate(espace):
         for y, ligne in enumerate(matrice):
             for z, coeff in enumerate(ligne):
                 if random() < indice:
                     espace[x][y][z] = VIDE
     return espace
-# Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande
 
 def bords(espace):
     """On borde l'espace de NEANT, sur tous ses côtés, sauf à la surface."""
