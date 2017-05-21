@@ -35,10 +35,10 @@ def draw(espace, subplot, clrs):
 def zero(n, p, q):
     """Crée un espace de zéros de taille n, p, q."""
     espace = [ROCHE] * n
-    for i in range(n): 
-        espace[i] = [ROCHE] * p
-        for j in range(p):
-            espace[i][j] = [ROCHE] * q
+    for y in range(n): 
+        espace[y] = [ROCHE] * p
+        for z in range(p):
+            espace[y][z] = [ROCHE] * q
     return espace
 
 def pores(espace, indice=.5):
