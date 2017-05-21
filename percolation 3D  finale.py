@@ -154,9 +154,8 @@ def resultat(espace):
         indice_coef = 0 # debut de ligne 
         while indice_coef < majorant_coef and matrice[indice_ligne][indice_coef] != EAU:
             indice_coef += 1 # balaye la ligne 
-        if indice_coef == majorant_coef:
-            indice_ligne += 1
-    return not indice_ligne == majorant_ligne
+        indice_ligne += 1
+    return not indice_coef == majorant_coef
     
 def percolation(espace, vecteurs, affichage=True):
     """Après l'infiltration de l'eau à travers un sol rocheux,
@@ -245,3 +244,4 @@ def copie(espace):
 if __name__ == '__main__':
     print(etude_un_espace(3, 4, 5, 0.5))
     indices_composantes_connexes(3, 3, 3, 100, 200)
+    pyplot.show()
