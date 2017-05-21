@@ -43,7 +43,7 @@ def zero(n, p, q):
 
 def pores(espace, indice=.5):
     """Introduit des pores vides au hasard, en fonction de l'indice de porosité.
-       Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande."""
+        Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande"""
     for x, matrice in enumerate(espace):
         for y, ligne in enumerate(matrice):
             for z, coeff in enumerate(ligne):
@@ -145,30 +145,19 @@ def infiltration(espace, vecteurs, eau_mouvante, affichage=True):
     
 def resultat(espace):
     """Indique s'il y a percolation ou pas."""
-    matrice = espace[len(espace)-2] # La matrice juste avant la matrice limite
-    for ligne in matrice:
-        for coef in ligne:
-            if coef == EAU:
-                return True
-    return False
-
-# TODO: Voici l' ancienne fonction avec un while.
-# def resultat(espace):
-#     """Indique s'il y a percolation ou pas."""
-#     matrice = espace[len(espace)-2]       # On ne considère que l'avant dernière matrice
-#     y, z = 0, 0
-#     p = len(matrice)-2                      # nombre de lignes dans chaque matrices
-#     q = len(matrice[0])-2                   # nombre de coefficients dans chaque lignes
-#     while y <= p and matrice[y][z] != EAU:
-#         if z != q:  # Si on est pas arrivé au bout de la ligne
-#             z += 1  # On considère le coefficient suivant
-#         else:
-#             y += 1  # On considère la ligne suivante
-#             z = 0
-#     if y == p + 1:
-#         return False
-#     return True
-
+    matrice = espace[len(espace)-2]   # La matrice juste avant la matrice limite    
+    majorant_ligne = len(matrice) 
+    majorant_coef = len(matrice[0])
+    indice_ligne = 0 
+    indice_coef =  majorant_coef
+    while indice_ligne < majorant_ligne and indice_coef == majorant_coef:
+        indice_coef = 0 # debut de ligne 
+        while indice_coef < majorant_coef and matrice[indice_ligne][indice_coef] != EAU:
+            indice_coef += 1 # balaye la ligne 
+        if indice_coef == majorant_coef:
+            indice_ligne += 1
+    return not indice_ligne == majorant_ligne
+    
 def percolation(espace, vecteurs, affichage=True):
     """Après l'infiltration de l'eau à travers un sol rocheux,
         retourne True si il y a percolation.""" 
@@ -180,7 +169,7 @@ def percolation(espace, vecteurs, affichage=True):
 
 def nombre_composantes_connexes(espace, vecteurs):
     """Renvoie le nombre d'alvéoles dans un espace après percolation."""
-    espace = deepcopy(espace)               # Crée une copie au lieu d'une référence
+    espace = deepcopy(espace)               # On ne modifie pas l'espace d'origine
     nombre_composantes_connexes = 0
     for x, matrice in enumerate(espace):
         for y, ligne in enumerate(matrice):
@@ -199,35 +188,9 @@ def etude_un_espace(n, p, q, indice, affichage=True):
         le nombre de composantes connexes pour un espace"""
     espace = creation_espace(n, p, q, indice)        
     vecteurs = vecteurs_espace(3)   # Liste des vecteurs possibles déplacement dans l'espace
-    return percolation(espace, vecteurs, affichage), nombre_composantes_connexes(espace, vecteurs)
+    return nombre_composantes_connexes(espace, vecteurs), percolation(espace, vecteurs, affichage)
     
 # Utilisation statistique:
-#TODO: fonction utilisant des dictionnaires {}
-def indices_composantes_connexes(n, p, q, indices, echantillons, affichage=True):
-    """Renvoie un dictionnaire associant une moyenne du nombre de composantes connexes à un indice de porosité.
-    indices: Nombre d'indices à calculer, équirépartis de 0 à 1.
-    echantillons: Taille de l'échantillon à calculer pour un indice donné.
-    affichage: Si True, affiche un graph du nombre de composantes connexes en fonction de l'indice."""
-    vecteurs = vecteurs_espace(3)
-    resultat = {}
-    for indice in range(indices):
-        indice_normalise = indice / indices
-        somme_composantes_connexes = 0
-        for echantillon in range(echantillons):
-            espace = creation_espace(n, p, q, indice_normalise)
-            somme_composantes_connexes += nombre_composantes_connexes(espace, vecteurs)
-        resultat[indice_normalise] = somme_composantes_connexes / echantillons
-    
-    if affichage:
-        fig = pyplot.figure()
-        subplot = fig.add_subplot(111)
-        subplot.set_xlabel("Indice")
-        subplot.set_ylabel("Moyenne de composantes connexes")
-        subplot.plot(tuple(resultat.keys()), tuple(resultat.values()), 'g*')
-    
-    return resultat
-    
-#TODO: fonction utilisant des listes [] 
 def indices_composantes_connexes(n, p, q, nbindices, nbechantillons, affichage=True): 
     """Renvoie deux listes associant une moyenne du nombre de composantes connexes
         à un indice de porosité.
@@ -255,14 +218,14 @@ def indices_composantes_connexes(n, p, q, nbindices, nbechantillons, affichage=T
     return indices, moyennes
 
 # Recodage des fonctions python utilisées:
-def enumerer(iterable):
+def enumerer1(iterable):
     """  un codage de enumerate """
     i= 0
     for item in iterable:
         yield i, item        # renvoie un i, item puis la fonction est en pause et continue lorsqu'elle est rappellée 
         i += 1 
 
-def enum(x):
+def enumerer2(x):
     """ un codage simplifié de enumerate """
     return [(i, x[i]) for i in range(len(x))]
     
@@ -280,5 +243,5 @@ def copie(espace):
     
 # fonctions de tests:        
 if __name__ == '__main__':
-    etude_un_espace(3, 4, 5, 0.5)
+    print(etude_un_espace(3, 4, 5, 0.5))
     indices_composantes_connexes(3, 3, 3, 100, 200)
