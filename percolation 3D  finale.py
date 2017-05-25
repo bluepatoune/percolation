@@ -33,7 +33,7 @@ def draw(espace, subplot, clrs):
                 
 # Génération aléatoire de l'espace de départ représentant la roche poreuse: 
 def zero(n, p, q):
-    """Crée un espace de zéros de taille n, p, q."""
+    """Crée un espace en 3 dimensions de zéros de taille n, p, q."""
     espace = [ROCHE] * n
     for y in range(n): 
         espace[y] = [ROCHE] * p
@@ -42,8 +42,7 @@ def zero(n, p, q):
     return espace
 
 def pores(espace, indice=.5):
-    """Introduit des pores vides au hasard, en fonction de l'indice de porosité.
-        Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande"""
+    """Introduit des pores vides au hasard, en fonction de l'indice de porosité. Plus l'indice de prorosité est élevé plus la probabilité de percolation est grande"""
     for x, matrice in enumerate(espace):
         for y, ligne in enumerate(matrice):
             for z, coeff in enumerate(ligne):
@@ -71,19 +70,19 @@ def creation_espace(n, p, q, indice=.5):
     espace = bords(espace)              # On ajoute des limites au volume
     return espace
 
-def vecteurs_espace(dim):
-    """Renvoie une liste des vecteurs de déplacements possibles dans l'espace."""
+def vecteurs_deplacement(dim):
+    """Renvoie une liste des vecteurs de déplacements possibles dans l'espace en n dimensions"""
     vecteurs = []
-    for direction in range(3):
+    for direction in range(dim):
         for sens in [-1, 1]:
-            vecteur = [0] * 3
+            vecteur = [0] * dim
             vecteur[direction] = sens
             vecteurs.append(vecteur)
     return vecteurs
 
 def initialisation(espace):
     """ Retourne l'espace une fois que la pluie est tombée 
-        et les premières coordonnées de l'eau mouvante """
+    et les premières coordonnées de l'eau mouvante """
     eau_mouvante = []
     for y, ligne in enumerate(espace[0]):
         for z, coef in enumerate(ligne):
@@ -93,8 +92,7 @@ def initialisation(espace):
     return espace, eau_mouvante
     
 def coordonnees_vide(espace, x, y, z, vecteurs):
-    """Renvoie la liste des coordonnées des pores vides 
-        autour d'une case d'eau mouvante."""
+    """Renvoie la liste des coordonnées des pores vides autour d'une case de coordonnées données en argument en fonction des vecteurs de déplacement"""
     pores_vides = []
     for vecteur in vecteurs:          
          coords = (x+vecteur[0], y+vecteur[1], z+vecteur[2])
@@ -109,21 +107,20 @@ def deplacement_eau(espace, pores_vides):
     return espace
     
 def coordonnees_eau(espace, eau_mouvante, vecteurs):
-    """Renvoie les coordonnées des nouvelles particules d'eau mouvante 
-        après l'infiltration de l'eau."""
+    """Renvoie les coordonnées des nouvelles particules d'eau mouvante après l'infiltration de l'eau. Les pores vides au temps t deviennent l'eau mouvante au temps t+1"""
     nouvelle_eau_mouvante = []
-    pores_vides_locaux = []     # Nécessaire pour ne pas enregistrer 2 fois un même pore
+    pores_vides_locaux = [] 
+    # Nécessaire pour ne pas enregistrer 2 fois un même pore
     for (x, y, z) in eau_mouvante:
         pores_vides_locaux = coordonnees_vide(espace, x, y, z, vecteurs)
         matrice = deplacement_eau(espace, pores_vides_locaux)
-        matrice[x][y][z] = EAU              # L' eau mouvante devient stagnante
+        matrice[x][y][z] = EAU          # L' eau mouvante devient stagnante
         nouvelle_eau_mouvante += pores_vides_locaux  
     return nouvelle_eau_mouvante
-# les pores vides au temps t deviennent l'eau mouvante au temps t+1
 
 def infiltration(espace, vecteurs, eau_mouvante, affichage=True):
     """Renvoie l'espace après infiltration de l'eau.
-        affichage: si True, affiche l'infiltration progressive dans la matrice 3D"""
+    affichage: si True, affiche l'infiltration progressive de l'eau  dans l'espace 3D"""
     if affichage:
         fig = pyplot.figure()
         subplot = fig.add_subplot(111, projection='3d')
@@ -134,8 +131,7 @@ def infiltration(espace, vecteurs, eau_mouvante, affichage=True):
         draw([[[-1, 0, 1, 2, 3]]], subplot, couleurs)
         pyplot.pause(1)
 
-    eau_mouvante = eau_mouvante
-    while eau_mouvante != []:   # Tant qu'il y a de d'eau mouvante dans l'espace
+    while eau_mouvante != []: # Tant qu'il y a de d'eau mouvante dans l'espace
         eau_mouvante = coordonnees_eau(espace, eau_mouvante, vecteurs)
         
         if affichage:
@@ -144,8 +140,9 @@ def infiltration(espace, vecteurs, eau_mouvante, affichage=True):
     return espace
     
 def resultat(espace):
-    """Indique s'il y a percolation ou pas."""
-    matrice = espace[len(espace)-2]   # La matrice juste avant la matrice limite    
+    """Indique s'il y a percolation ou pas.
+    Renvoie True si il y a de l'eau stagnante dans la dernière matrice"""
+    matrice = espace[len(espace)-2] # La matrice juste avant la matrice limite    
     majorant_ligne = len(matrice) 
     majorant_coef = len(matrice[0])
     indice_ligne = 0 
@@ -155,20 +152,19 @@ def resultat(espace):
         while indice_coef < majorant_coef and matrice[indice_ligne][indice_coef] != EAU:
             indice_coef += 1 # balaye la ligne 
         indice_ligne += 1
-    return not indice_coef == majorant_coef
+    return not indice_coef == majorant_coef 
     
 def percolation(espace, vecteurs, affichage=True):
-    """Après l'infiltration de l'eau à travers un sol rocheux,
-        retourne True si il y a percolation.""" 
+    """Après l'infiltration de l'eau à travers un sol rocheux à 3 dimensions,
+    renvoie True si il y a percolation.""" 
     etat_initial = initialisation(espace)    # Modélisation de la pluie
-    eau_mouvante1 = etat_initial[1]          # Les premières coordonnées d'eau mouvante 
-    espace = etat_initial[0]                 # L'ancien espace est remplacé par le nouveau
-    espace = infiltration(espace, vecteurs, eau_mouvante1, affichage)
+    premiere_eau_mouvante = etat_initial[1]           
+    espace = etat_initial[0]                 # initialisation de l'espace 
+    espace = infiltration(espace, vecteurs, premiere_eau_mouvante, affichage)
     return resultat(espace)
 
 def nombre_composantes_connexes(espace, vecteurs):
-    """Renvoie le nombre d'alvéoles dans un espace après percolation."""
-    espace = deepcopy(espace)               # On ne modifie pas l'espace d'origine
+    """Renvoie le nombre de composantes connexes dans un espace à 3 dimensions."""
     nombre_composantes_connexes = 0
     for x, matrice in enumerate(espace):
         for y, ligne in enumerate(matrice):
@@ -184,21 +180,21 @@ def nombre_composantes_connexes(espace, vecteurs):
 # Pour un espace généré aléatoirement:
 def etude_un_espace(n, p, q, indice, affichage=True):
     """ Renvoie le resultat de la percolation et
-        le nombre de composantes connexes pour un espace"""
+    le nombre de composantes connexes pour un espace à 3 dimensions"""
     espace = creation_espace(n, p, q, indice)        
-    vecteurs = vecteurs_espace(3)   # Liste des vecteurs possibles déplacement dans l'espace
-    return nombre_composantes_connexes(espace, vecteurs), percolation(espace, vecteurs, affichage)
+    vecteurs = vecteurs_deplacement(3) # Les vecteurs en 3 dimensions
+    copie_espace = deepcopy(espace) # On ne modifie pas l'espace d'origine
+    return nombre_composantes_connexes(copie_espace, vecteurs), percolation(espace, vecteurs, affichage)
     
 # Utilisation statistique:
-def indices_composantes_connexes(n, p, q, nbindices, nbechantillons, affichage=True): 
-    """Renvoie deux listes associant une moyenne du nombre de composantes connexes
-        à un indice de porosité.
+def indices_moyennes_composantes_connexes(n, p, q, nbindices, nbechantillons, affichage=True): 
+    """Renvoie deux listes: les indices de porosité et les moyennes du nombre de composantes connexe associées. 
     nbindices: Nombre d'indices à calculer, équirépartis de 0 à 1.
-    nbechantillons: Taille de l'échantillon à calculer pour un indice donné.
+    nbechantillons: Taille de l'échantillon à calculer, assez grand pour appliquer la loi des grands nombres  
     affichage: Si True, affiche un graph des moyennes de composantes connexes en fonction de l'indice."""
     moyennes = []
     indices = []   
-    vecteurs = vecteurs_espace(3)
+    vecteurs = vecteurs_deplacement(3)
     for indice in range(nbindices):
         indice_normalise = indice / nbindices
         indices.append(indice_normalise)
@@ -211,7 +207,7 @@ def indices_composantes_connexes(n, p, q, nbindices, nbechantillons, affichage=T
     if affichage:
         fig = pyplot.figure()
         subplot = fig.add_subplot(111)
-        subplot.set_xlabel("Indice")
+        subplot.set_xlabel("Indice de porosité")
         subplot.set_ylabel("Moyenne des composantes connexes")
         subplot.plot(indices, moyennes, 'g*')
     return indices, moyennes
@@ -221,8 +217,9 @@ def enumerer1(iterable):
     """  un codage de enumerate """
     i= 0
     for item in iterable:
-        yield i, item        # renvoie un i, item puis la fonction est en pause et continue lorsqu'elle est rappellée 
+        yield i, item        
         i += 1 
+# yield renvoie un i, item puis la fonction est en pause et continue lorsqu'elle est rappellée 
 
 def enumerer2(x):
     """ un codage simplifié de enumerate """
@@ -242,6 +239,6 @@ def copie(espace):
     
 # fonctions de tests:        
 if __name__ == '__main__':
-    print(etude_un_espace(3, 4, 5, 0.5))
-    indices_composantes_connexes(3, 3, 3, 100, 200)
+    print(etude_un_espace(3, 4, 5, 0.5,False))
+    indices_moyennes_composantes_connexes(3, 3, 3, 50, 1000)
     pyplot.show()
