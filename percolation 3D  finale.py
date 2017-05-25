@@ -195,7 +195,7 @@ def indices_moyennes_composantes_connexes(n, p, q, nbindices, nbechantillons, af
     moyennes = []
     indices = []   
     vecteurs = vecteurs_deplacement(3)
-    for indice in range(nbindices):
+    for indice in range(nbindices + 1):
         indice_normalise = indice / nbindices
         indices.append(indice_normalise)
         somme_composantes_connexes = 0
